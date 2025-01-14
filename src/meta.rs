@@ -93,6 +93,7 @@ impl Header {
         let mut buf: [u8; MAX_LENGTH] = [0; MAX_LENGTH];
         let mut had_written = false;
 
+        //@note limit max record len : 65535
         loop {
             let read = content.read(&mut buf).await?;
             if had_written && read == 0 {
@@ -111,6 +112,7 @@ impl Header {
         Ok(())
     }
 
+    /// create Header with padding
     fn new(r#type: RequestType, request_id: u16, content: &[u8]) -> Self {
         let content_length = min(content.len(), MAX_LENGTH) as u16;
         Self {
@@ -126,6 +128,7 @@ impl Header {
     async fn write_to_stream<W: AsyncWrite + Unpin>(
         self, writer: &mut W, content: &[u8],
     ) -> io::Result<()> {
+        //@todo avoid allocate every time write
         let mut buf: Vec<u8> = Vec::new();
         buf.push(self.version);
         buf.push(self.r#type as u8);
@@ -198,6 +201,7 @@ impl BeginRequest {
         }
     }
 
+    //@note BeginRequest serialize
     pub(crate) async fn to_content(&self) -> io::Result<Vec<u8>> {
         let mut buf: Vec<u8> = Vec::new();
         buf.write_u16(self.role as u16).await?;
@@ -317,6 +321,8 @@ impl<'a> ParamPairs<'a> {
         Self(param_pairs)
     }
 
+    ///@todo fastcgi max content size=64k
+    /// if result vec exceed 64k, may be error
     pub(crate) async fn to_content(&self) -> io::Result<Vec<u8>> {
         let mut buf: Vec<u8> = Vec::new();
 
