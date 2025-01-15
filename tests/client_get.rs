@@ -42,7 +42,7 @@ async fn test1() {
 async fn test_client1<S: AsyncRead + AsyncWrite + Unpin>(client: Client<S, ShortConn>) {
     let document_root = "/var/www/html";
     dbg!(document_root);
-    let script_file = "/var/www/html/first1.php";
+    let script_file = "/var/www/html/first.php";
     dbg!(script_file);
     let mut params = Params::default()
         .request_method("GET")

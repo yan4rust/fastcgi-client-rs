@@ -81,6 +81,8 @@ pub(crate) struct Header {
 }
 
 impl Header {
+    /// @note write Record stream 
+    // content can be arbitrary length;
     pub(crate) async fn write_to_stream_batches<F, R, W>(
         r#type: RequestType, request_id: u16, writer: &mut W, content: &mut R,
         before_write: Option<F>,
@@ -112,7 +114,7 @@ impl Header {
         Ok(())
     }
 
-    /// create Header with padding
+    /// @note create Header with padding
     fn new(r#type: RequestType, request_id: u16, content: &[u8]) -> Self {
         let content_length = min(content.len(), MAX_LENGTH) as u16;
         Self {
@@ -125,6 +127,7 @@ impl Header {
         }
     }
 
+    /// @note write one record to stream,with padding data
     async fn write_to_stream<W: AsyncWrite + Unpin>(
         self, writer: &mut W, content: &[u8],
     ) -> io::Result<()> {
